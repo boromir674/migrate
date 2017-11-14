@@ -1,0 +1,6 @@
++ Terminal text color: #FF5D00
++ Background color: #000000
+
+Color palette:
+#073642, #DC2F54, #0F3004, #B58900, #268BD2, #D33682, #2AA198, #EEE8D5,
+#002B36, #CB4B16, #586E75, #657B83. #839496, #6C71C4, #93A1A1, #FDF6E3
