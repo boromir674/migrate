@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Env;
+use LWP::Simple;
 use Data::Dumper;
 use feature 'say';
 use YAML::XS 'LoadFile';
@@ -8,7 +9,7 @@ use APT;
 
 ########## CONSTANTS ##########
 my $soft_n_libs_dir = "/home/$ENV{USER}/soft-n-libs";
-my $deb_download_dir = $soft_n_libs_dir;
+my $download_dir = $soft_n_libs_dir;
 my $go_root_dir = "$soft_n_libs_dir/go";
 my $bashrc = "/home/$ENV{USER}/del_bashrc";
 my $bash_aliases = "/home/$ENV{USER}/del_bash_aliases";
@@ -21,11 +22,6 @@ my $config = LoadFile('config.cfg');
 # my $apt_cache_path = `which apt-cache`;
 
 my @failed = ();
-
-# my $apt = APT->new(
-#     aptget => '/usr/bin/sudo $apt_get_path -s', # sudo and no-act
-#     aptcache => '/usr/bin/sudo $apt_cache_path', # sudo
-#     );
 
 # print Dumper($config); # print dict sructure
 
@@ -53,12 +49,12 @@ for (keys %{$config->{reprograms}}) {
 for (keys %{$config->{webelements}}) {
     my $program = $_;
     my $url = $config->{webelements}->{$_};
-    `which $program >/dev/null`;
+    `which program1 >/dev/null`;
     if ($? == 0) {
         print "Program $program is already installed\n";
     }
     else {
-        bring_deb($program, $url, $deb_download_dir);
+        bring_deb($program, $url, $download_dir);
     }
 }
 
@@ -70,28 +66,21 @@ for (keys %{$config->{repos}}) {
     git_clone($key_tag, $specs[0], $specs[1]);
 }
 
-sub m_install {
-    my $binary = shift;
-    my $repo = shift;
-    my $alias = shift;
-    $ENV{'GOPATH'} = '$go_root_dir' && print "exported GOPATH variable as $go_root_dir/\n";
-    get_install("golang-go git");
-    print $repo, "\n";
-    if ($repo =~ /https?:\/+(.+)\.git/) {
-        print "$1\n";
-        `go get blah` && print "got repo '$1' in GOPATH\n";
-    }
-
- #   `alias $alias='$go_root_dir/bin/$binary\n'` && print "aliased $go_root_dir/bin/$binary as $alias\n";
-#     write_alias($alias, "$go_root_dir/bin/$binary");
-}
-
-###### process repo4compile ######
+###### process gorepos ######
 print "\n";
-for (keys %{$config->{repos4compile}}) {
+for (keys %{$config->{gorepos}}) {
     my $binary = $_;
-    my @specs = @{ $config->{repos4compile}->{$_} };
-    m_install($binary, $specs[0], $specs[1]);
+    my @specs = @{ $config->{gorepos}->{$_} };
+    system("./install-wego.sh $binary $specs[0] $go_root_dir $bash_aliases $specs[1]");
+    my $exit_val = $? >> 8;
+#    print "exit: $exit_val\n";
+    if ($exit_val == 0) {
+        print "Installed $binary\n";
+    }
+    else {
+        print "Failed to install wego\n";
+        push @failed, $binary; 
+    }
 }
 
 ########## SUBS ##########
@@ -114,7 +103,6 @@ sub get_install {
     }
 }
 
-
 sub bring_deb {
     my $name = shift;
     my $url = shift;
@@ -130,14 +118,30 @@ sub bring_deb {
     else {
         `mkdir $dir`;
     }
-    `wget -O ./$dir/$name.deb $url >> /dev/null 2>&1`;
-    if ( $? == 0 ) {
-        print "Downloaded debian package $url as $name.deb in $dir\n";
+    # my $cmd = "wget -O $dir/$name.deb $url";
+    # print "$cmd\n";
+    my $data = get("$url");
+    print "Retrieved " . length($data) . " bytes of data.\n";
+    my $exit_value  = $? >> 8;
+    print "\nexit code: $exit_value\n";
+    #    open(my $out, '>:raw', '$dir/$name.deb') or die "Unable to open: $!";
+    print "name: $name\n";
+    print "url: $url\n";
+    print "dir: $dir\n";
+
+#    system("touch $dir/$name.deb");
+    open my $fh, ">:raw", "$dir/$name.deb" or die "file: $dir/$name.deb , failed $!";
+#    open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
+    print $fh pack($data);
+    if ( $exit_value == 1 ) {
+        print "Saved debian package $url as $name.deb in $dir/\n";
     }
     else {
-        print "Failed to download debian package $url as $name.deb\n";
+        print "Failed to download debian package $url as $name.deb in $dir/\n";
         push @failed, "$name: $url";
     }
+    close($fh);
+
 }
 
 sub add_repo {
@@ -181,8 +185,6 @@ sub git_clone {
     }
 }
 
-
-
 sub write_alias {
     my $alias = shift;
     my $binary_path = shift;
@@ -192,8 +194,22 @@ sub write_alias {
 }
 
 if (@failed) {
-    print "\nFailed: ", join(', ', @failed), "\n";
+    print "Failed: ", join(', ', @failed), "\n";
 }
 
-print "\nMigration complete\n";
+print "\nMigration complete\n\n";
 
+
+# sub m_install {
+#     my $binary = shift;
+#     my $repo = shift;
+#     my $alias = shift;
+#     $ENV{'GOPATH'} = '$go_root_dir' && print "exported GOPATH variable as $go_root_dir/\n";
+#     get_install("golang-go git");
+#     print $repo, "\n";
+#     if ($repo =~ /https?:\/+(.+)\.git/) {
+#         print "$1\n";
+#         `go get blah` && print "got repo '$1' in GOPATH\n";
+#     }
+
+# }

@@ -6,8 +6,6 @@ go_root_dir=$3
 aliases_file=$4
 the_alias=$5
 
-echo $git_url
-
 if [ -z $GOPATH ]; then
     export GOPATH=$go_root_dir && echo "Set environment variable 'GOPATH' as $go_root_dir"
 else
@@ -23,7 +21,6 @@ fi
 
 regex="https?://(.*).git"
 
-
 if [[ $git_url =~ $regex ]]; then
     repo="${BASH_REMATCH[1]}";
     go get $repo >/dev/null
@@ -33,9 +30,11 @@ if [[ $git_url =~ $regex ]]; then
         echo "Please source yourself and use as '$the_alias'"
     else
         echo "Go failed to get '$repo'"
+        exit 1
     fi
 else
     echo "'$git_url' doesn't match" >&2
+    exit 1
 fi
 
 
