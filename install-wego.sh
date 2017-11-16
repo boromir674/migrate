@@ -20,15 +20,21 @@ else
     apt-get install golang git > /dev/null && echo "Installed 'go' program"
 fi
 
-regex="https?:\/\/(.*)"
+# echo $git_url
+# repo=${git_url:8:-4}
+# echo $repo
+
+regex="https?://(.*).git"
 echo $regex
-if [[ $git_url =~ $regex ]]
-then
-    name="${BASH_REMATCH[1]}"
-    echo "${name}"    # concatenate strings
-    name="${name}"    # same thing stored in a variable
+
+if [[ $git_url =~ $regex ]]; then
+    repo="${BASH_REMATCH[1]}";
+    echo $repo
+    # repo=${repo/.git/}
+    # echo $repo
 else
-    echo "$f doesn't match" >&2
+    echo "$git_url doesn't match" >&2
 fi
 
+go get $repo && echo  "got repo '$repo' in GOPATH\n";
 
