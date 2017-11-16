@@ -54,7 +54,15 @@ for (keys %{$config->{webelements}}) {
         print "Program $program is already installed\n";
     }
     else {
-        bring_deb($program, $url, $download_dir);
+        system("./download-deb.sh $program $url $download_dir");
+        my $exit_val = $? >> 8;
+        if ($exit_val == 0) {
+            print "Program $program ready to install\n";
+        }
+        else {
+            print "Failed downloading for program $program\n";
+            push @failed, $program;
+        }
     }
 }
 
@@ -73,7 +81,6 @@ for (keys %{$config->{gorepos}}) {
     my @specs = @{ $config->{gorepos}->{$_} };
     system("./install-wego.sh $binary $specs[0] $go_root_dir $bash_aliases $specs[1]");
     my $exit_val = $? >> 8;
-#    print "exit: $exit_val\n";
     if ($exit_val == 0) {
         print "Installed $binary\n";
     }
@@ -194,22 +201,7 @@ sub write_alias {
 }
 
 if (@failed) {
-    print "Failed: ", join(', ', @failed), "\n";
+    print "\nFailed: ", join(', ', @failed), "\n";
 }
 
 print "\nMigration complete\n\n";
-
-
-# sub m_install {
-#     my $binary = shift;
-#     my $repo = shift;
-#     my $alias = shift;
-#     $ENV{'GOPATH'} = '$go_root_dir' && print "exported GOPATH variable as $go_root_dir/\n";
-#     get_install("golang-go git");
-#     print $repo, "\n";
-#     if ($repo =~ /https?:\/+(.+)\.git/) {
-#         print "$1\n";
-#         `go get blah` && print "got repo '$1' in GOPATH\n";
-#     }
-
-# }
