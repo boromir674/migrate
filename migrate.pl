@@ -18,14 +18,17 @@ my $gitconfig = "/home/$ENV{USER}/del_gitconfig";
 ###############################
 
 my $config = LoadFile('config.cfg');
-# my $apt_get_path = `which apt-get`;
-# my $apt_cache_path = `which apt-cache`;
 
 my @failed = ();
 
 # print Dumper($config); # print dict sructure
 
 print "Begin migration\n\n";
+
+print "Updating apt ...\n";
+system("sudo apt-get -qqy update");
+print "Upgrading apt ...\n\n";
+system("sudo apt-get -qqy upgrade");
 
 ###### process programs ######
 
@@ -196,13 +199,13 @@ sub git_clone {
     my $key_tag = shift;
     my $repo = shift;
     my $dir = shift;
-    print "Cloning $repo for $key_tag in $dir\n";
+    print "Cloning '$repo' for '$key_tag' in $dir\n";
     `git clone $repo $dir >/dev/null 2>&1`;
     if ($? == 0) {
-        print "Cloned repo $repo for $key_tag in $dir\n";
+        print "Cloned repo '$repo' for '$key_tag' in $dir\n";
     }
     else {
-        print "Failed to clone repo $repo for $key_tag in $dir\n";
+        print "Failed to clone repo '$repo' for '$key_tag' in $dir\n";
         push @failed, "$key_tag: $repo";
     }
 }
