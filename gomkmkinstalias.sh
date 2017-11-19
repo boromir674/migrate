@@ -19,8 +19,7 @@ go get -v $git_url >/dev/null 2>&1
 
 regex="github.com/(.*)"
 if [[ $git_url =~ $regex ]]; then
-    path="${BASH_REMATCH[1]}";
-    echo path: $path
+    path="${BASH_REMATCH[1]}"
 fi
 
 dir_here="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
@@ -32,10 +31,11 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then
         $dir_here/write-alias.sh $the_alias $go_root_dir/bin/$binary $aliases_file
     else
+        cd -
         exit 1
     fi
 else
+    cd -
     exit 1
 fi
 cd -
-
