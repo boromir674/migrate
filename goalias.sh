@@ -11,9 +11,7 @@ if [ -z $GOPATH ]; then
 fi
 
 which go >/dev/null
-if [ $? -eq 0 ]; then
-    echo Program go is already installed
-else
+if [ $? -ne 0 ]; then
     apt-get install golang git > /dev/null && echo "Installed 'go' program"
 fi
 

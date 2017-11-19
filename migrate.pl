@@ -81,7 +81,7 @@ for (keys %{$config->{repos}}) {
 for (keys %{$config->{gorepos}}) {
     my $binary = $_;
     my @specs = @{ $config->{gorepos}->{$_} };
-    system("./install-wego.sh $binary $specs[0] $go_root_dir $bash_aliases $specs[1]");
+    system("./goalias.sh $binary $specs[0] $go_root_dir $bash_aliases $specs[1]");
     my $exit_val = $? >> 8;
     if ($exit_val == 0) {
         print "Installed $binary\n";
@@ -205,14 +205,6 @@ sub git_clone {
         print "Failed to clone repo $repo for $key_tag in $dir\n";
         push @failed, "$key_tag: $repo";
     }
-}
-
-sub write_alias {
-    my $alias = shift;
-    my $binary_path = shift;
-    open(my $fh, '>>', '~/.bash_aliases') or die "Failed to open ~/.bash_aliases";
-    say $fh "alias $alias='$binary_path'" && print "aliased $binary_path as $alias\n";
-    close $fh;
 }
 
 if (@failed) {

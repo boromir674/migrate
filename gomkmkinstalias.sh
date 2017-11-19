@@ -6,15 +6,11 @@ go_root_dir=$3
 aliases_file=$4
 the_alias=$5
 
-echo b $binary
-echo g $git_url
-echo go $go_root_dir
-
 if [ -z $GOPATH ]; then
     export GOPATH=$go_root_dir && echo "Set environment variable 'GOPATH' as $go_root_dir"
 fi
 
-echo "go getting $git_url"
+echo "Go getting $git_url"
 go get -v $git_url >/dev/null 2>&1
 
 regex="github.com/(.*)"
@@ -31,11 +27,11 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then
         $dir_here/write-alias.sh $the_alias $go_root_dir/bin/$binary $aliases_file
     else
-        cd -
+        cd - >/dev/null
         exit 1
     fi
 else
-    cd -
+    cd - >/dev/null
     exit 1
 fi
-cd -
+cd - >/dev/null
