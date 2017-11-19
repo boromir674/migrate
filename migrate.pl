@@ -25,6 +25,8 @@ my @failed = ();
 
 # print Dumper($config); # print dict sructure
 
+print "Begin migration\n\n";
+
 ###### process programs ######
 
 for (keys %{$config->{programs}}) {
@@ -75,7 +77,7 @@ for (keys %{$config->{repos}}) {
 }
 
 ###### process gorepos ######
-print "\n";
+
 for (keys %{$config->{gorepos}}) {
     my $binary = $_;
     my @specs = @{ $config->{gorepos}->{$_} };
@@ -85,7 +87,20 @@ for (keys %{$config->{gorepos}}) {
         print "Installed $binary\n";
     }
     else {
-        print "Failed to install wego\n";
+        print "Failed to install $binary\n";
+        push @failed, $binary;
+    }
+}
+
+###### process gomkmkinstalias ######
+
+for (keys %{$config->{gomkmkinstalias}}) {
+    my $binary = $_;
+    my @specs = @{ $config->{gomkmkinstalias}->{$_} };
+    system("./gomkmkinstalias.sh $binary $specs[0] $go_root_dir $bash_aliases $specs[1]");
+    my $exit_val = $? >> 8;
+    if ($exit_val != 0) {
+        print "Failed to install $binary\n";
         push @failed, $binary; 
     }
 }
