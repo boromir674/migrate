@@ -8,8 +8,6 @@ the_alias=$5
 
 if [ -z $GOPATH ]; then
     export GOPATH=$go_root_dir && echo "Set environment variable 'GOPATH' as $go_root_dir"
-else
-    export GOPATH=$GOPATH:$go_root_dir && echo "Appended $go_root_dir to the environment variable 'GOPATH'"
 fi
 
 which go >/dev/null
@@ -25,7 +23,8 @@ if [[ $git_url =~ $regex ]]; then
     repo="${BASH_REMATCH[1]}";
     go get $repo >/dev/null
     if [ $? -eq 0 ]; then
-        echo "Go got repo '$repo' in GOPATH";
+        echo "Go got repo '$repo' in GOPATH"
+        write-alias.sh $the_alias $go_root_dir/bin/$binary $aliases_file
         echo "alias $the_alias='$go_root_dir/bin/$binary'" >> $aliases_file && echo "Wrote alias in $aliases_file"
         echo "Please source yourself and use as '$the_alias'"
     else
