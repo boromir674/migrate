@@ -24,7 +24,7 @@ if [[ $git_url =~ $regex ]]; then
     go get $repo >/dev/null
     if [ $? -eq 0 ]; then
         echo "Go got repo '$repo' in GOPATH"
-        write-alias.sh $the_alias $go_root_dir/bin/$binary $aliases_file
+        ./write-alias.sh $the_alias $go_root_dir/bin/$binary $aliases_file
     else
         echo "Go failed to get '$repo'"
         exit 1
