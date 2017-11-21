@@ -1,0 +1,66 @@
+# Ovverides existing command mcd (mtools and stuff...)
+mcd () {
+    mkdir -p $1
+    cd $1
+}
+
+# set current terminal's title to given title
+
+function set-title() {
+  if [[ -z "$ORIG" ]]; then
+    ORIG=$PS1
+  fi
+  TITLE="\[\e]2;$*\a\]"
+  PS1=${ORIG}${TITLE}
+}
+
+pc-info () {
+  printf "CPU: "
+  cat /proc/cpuinfo | grep "model name" | head -1 | awk '{ for (i = 4; i <= NF; i++) printf "%s ", $i }'
+  printf "\n"
+
+  cat /etc/issue | head -1 | awk '{ printf "OS: %s %s %s %s " , $1 , $2 , $3 , $4 }'
+  uname -a | awk '{ printf "| Kernel: %s " , $3 }'
+  uname -m | awk '{ printf "%s | " , $1 }'
+  kded4 --version | grep "KDE Development Platform" | awk '{ printf "KDE: %s", $4 }'
+  printf "\n"
+  uptime | awk '{ printf "Uptime: %s %s %s", $3, $4, $5 }' | sed 's/,//g'
+  printf "\n"
+  sensors | grep Core | head -1 | awk '{ printf "%s %s %s\n", $1, $2, $3 }'
+  sensors | grep Core | tail -1 | awk '{ printf "%s %s %s\n", $1, $2, $3 }'
+  #cputemp | awk '{ printf "%s %s", $1 $2 }'
+  pydf
+  \free -hw
+}
+
+function poly-extract {
+ if [ -z "$1" ]; then
+    # display usage if no parameters given
+    echo "Usage: extract <path/file_name>.<zip|rar|bz2|gz|tar|tbz2|tgz|Z|7z|xz|ex|tar.bz2|tar.gz|tar.xz>"
+ else
+    if [ -f $1 ] ; then
+        # NAME=${1%.*}
+        # mkdir $NAME && cd $NAME
+        case $1 in
+          *.tar.bz2)   tar xvjf ../$1    ;;
+          *.tar.gz)    tar xvzf ../$1    ;;
+          *.tar.xz)    tar xvJf ../$1    ;;
+          *.lzma)      unlzma ../$1      ;;
+          *.bz2)       bunzip2 ../$1     ;;
+          *.rar)       unrar x -ad ../$1 ;;
+          *.gz)        gunzip ../$1      ;;
+          *.tar)       tar xvf ../$1     ;;
+          *.tbz2)      tar xvjf ../$1    ;;
+          *.tgz)       tar xvzf ../$1    ;;
+          *.zip)       unzip ../$1       ;;
+          *.Z)         uncompress ../$1  ;;
+          *.7z)        7z x ../$1        ;;
+          *.xz)        unxz ../$1        ;;
+          *.exe)       cabextract ../$1  ;;
+          *)           echo "extract: '$1' - unknown archive method" ;;
+        esac
+    else
+        echo "$1 - file does not exist"
+    fi
+fi
+}

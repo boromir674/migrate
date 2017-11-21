@@ -1,0 +1,56 @@
+
+##### must #####
+alias ls='ls -hFG --color=auto'
+alias lltr='ll -tr'
+alias ltr='ls -ltr'
+alias ll='ls -Al'
+alias l='ls -l'
+
+alias psg='ps aux | grep -v grep | grep -i -e VSZ -e' # usage i.e. psg clementine
+alias cpu-model='fgrep -m1 "model name" /proc/cpuinfo'
+alias ip-public='curl http://ipecho.net/plain; echo'
+alias mem-size='fgrep MemTotal /proc/meminfo'
+alias df='df -Th' # Type and human readable
+alias free='free -hw' # human and wide
+alias cpu-temp='sensors | grep Core'
+alias mem-status='free -hw'
+alias disks='pydf -h'
+alias process=psg
+alias browse=ncdu
+# must #####
+
+##### optional #####
+alias latr='ls -Atr'
+alias lstr='ls -tr'
+alias la='ls -A'
+
+alias gb='git branch'
+alias gtl='git tl'
+alias gst='git st'
+# optional #####
+
+##### usefull #####
+alias off='shutdown now'
+alias source-bashrc='source ~/.bashrc'
+alias pycharm='pycharm > /dev/null 2>&1 &'
+alias ps='ps auxf' # list ALL running processes
+alias mkdir='mkdir -vp' # versbose and create parent folders
+alias wget='wget -c' # continue downloading in case of problems
+
+alias mail='thunderbird >/dev/null 2>&1 &'
+
+alias show-vars='printenv'
+alias find-recent='find . -type f -mtime 0'
+
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+alias functions='grep -E "^(\w+-?)+ \(\) \{|function" ~/.bash_functions | sed "s/ //;s/function//;s/(?)? { ?//g;s/ //" | sed -e "s/^/function /"'
+
+# all recursively, show total, human readable and sort ascending according to h
+alias du='du -ach | sort -h'
+
+# Add an "alert" alias for long running commands. Use like so: sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//''')"'
+# usefull #####
