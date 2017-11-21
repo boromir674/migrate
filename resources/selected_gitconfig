@@ -1,21 +1,21 @@
 [user]
-	name = 
+	name  = 
 	email = 
 
 [alias]
-  tl            = log --graph --all --oneline  --decorate
-  tl1           = log --graph --all --full-history --oneline --decorate
-  t12           = log --graph --all --full-history --color --oneline --decorate
-  st            = status
-  stu           = status -uno
-  cm            = commit -m
-  ca            = commit --amend
-  root          = rev-parse --show-toplevel
-  dn            = diff --name-only
-  ls            = log --stat --decorate
-  ch            = checkout
-  push-n-track  = "!sh -c \"git push -u origin $1\" -"s  # push local branch and track to be able to auto pull/push
-  del-remote    = "!sh -c \"git push origin --delete $1\" -"s  # delete remote branch
+  tl             = log --graph --all --oneline  --decorate
+  tl1            = log --graph --all --full-history --oneline --decorate
+  t12            = log --graph --all --full-history --color --oneline --decorate
+  st             = status
+  stu            = status -uno
+  cm             = commit -m
+  root           = rev-parse --show-toplevel
+  dn             = diff --name-only
+  ls             = log --stat --decorate
+  ch             = checkout
+  push-n-track   = "!sh -c \"git push -u origin $1\" -"s  # push local branch and track to be able to auto pull/push
+  del-remote     = "!sh -c \"git push origin --delete $1\" -"s  # delete remote branch
+  mirror-n-track = "!sh -c \"git branch --track $1 origin/$1\" -"s # "copy" remote branch to create identical local and track
 
 [branch]
 	autosetuprebase = always
@@ -32,6 +32,6 @@
 	mnemonicprefix = true
 	renames = copies
 [advice]
-	pushNonFastForward = false  # if pushing is blocked, just force fast forward (i.e. git push -f)
+        pushNonFastForward = false  # if pushing is blocked, just force fast forward (i.e. git push -f)
 [rerere]
 	enabled = true
