@@ -11,6 +11,7 @@
   cm             = commit -m
   root           = rev-parse --show-toplevel
   dn             = diff --name-only
+  ds             = diff --stat
   ls             = log --stat --decorate
   ch             = checkout
   push-n-track   = "!sh -c \"git push -u origin $1\" -"s  # push local branch and track to be able to auto pull/push

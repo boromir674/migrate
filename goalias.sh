@@ -31,8 +31,3 @@ else
     echo "'$git_url' doesn't match" >&2
     exit 1
 fi
-
-
-
-
-
