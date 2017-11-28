@@ -6,6 +6,7 @@ use Data::Dumper;
 use feature 'say';
 use YAML::XS 'LoadFile';
 use APT;
+use File::Basename;
 
 # print Dumper($config); # print dict sructure
 my $config = LoadFile('config.cfg');
@@ -115,6 +116,24 @@ for (keys %{$config->{gomkmkinstalias}}) {
 
 ########## SUBS ##########
 
+sub copy_file {
+    my $source = shift;
+    my $file_source = basename($source);
+    my $target = shift;
+    my $file_target = basename($target);
+    my $dir = dirname($target);
+
+    system("cp $target $target.bak && echo Backed up existed '$file_target' found in '$dir'") if -e $target;
+    system("cp $source $target");
+    my $exit_val = $? >> 8;
+    if ($exit_val == 0) {
+        print "Copied '$file_source' in '$dir'\n";
+    } else {
+        print "Failed to copy '$file_source' in '$dir'\n";
+        push @failed, $file_source;
+    }
+}
+
 sub get_install {
     my $program = shift;
     `which $program >/dev/null`;
@@ -141,9 +160,8 @@ sub bring_deb {
 
     }
     elsif (-e $dir) {
-        print "Requested to download .deb package in directory '$dir', but there is already a file with the same name\n";
+        print "Requested to download .deb package in directory '$dir', but there is already a file with the same name\nSkipping download\n";
         push @failed, "$name: $url";
-        exit
     }
     else {
         `mkdir $dir`;
