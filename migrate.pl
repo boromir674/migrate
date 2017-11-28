@@ -7,28 +7,33 @@ use feature 'say';
 use YAML::XS 'LoadFile';
 use APT;
 
-########## CONSTANTS ##########
-my $soft_n_libs_dir = "/home/$ENV{USER}/soft-n-libs";
-my $download_dir = $soft_n_libs_dir;
-my $go_root_dir = "$soft_n_libs_dir/go";
-my $bashrc = "/home/$ENV{USER}/del_bashrc";
-my $bash_aliases = "/home/$ENV{USER}/del_bash_aliases";
-my $bash_functions = "/home/$ENV{USER}/del_bash_functions";
-my $gitconfig = "/home/$ENV{USER}/del_gitconfig";
-###############################
-
-my $config = LoadFile('config.cfg');
-
-my @failed = ();
-
 # print Dumper($config); # print dict sructure
+my $config = LoadFile('config.cfg');
+my @failed = ();
+my @constants = ();
+
+for (keys %{$config->{paths}}) {
+    my $key = $_;
+    my $value = $config->{paths}->{$_};
+    push @constants, $value;
+}
+
+########## CONSTANTS ##########
+my $soft_n_libs_dir = shift @constants;
+my $download_dir = shift @constants;
+my $bashrc = shift @constants;
+my $bash_aliases = shift @constants;
+my $bash_functions = shift @constants;
+my $gitconfig = shift @constants;
+my $go_root_dir = "$soft_n_libs_dir/go";
+###############################
 
 print "Begin migration\n\n";
 
 print "Updating apt ...\n";
-system("sudo apt-get -qqy update");
+system("sudo apt-get -qqy update >/dev/null 2>&1");
 print "Upgrading apt ...\n\n";
-system("sudo apt-get -qqy upgrade");
+system("sudo apt-get -qqy upgrade >/dev/null 2>&1");
 
 ###### process programs ######
 
