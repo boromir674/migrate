@@ -7,9 +7,11 @@ use feature 'say';
 use YAML::XS 'LoadFile';
 use APT;
 use File::Basename;
+use File::Spec;
 
 # print Dumper($config); # print dict sructure
 my $config = LoadFile('config.cfg');
+my $resources = dirname($0) . "/resources";
 my @failed = ();
 my @constants = ();
 
@@ -20,21 +22,32 @@ for (keys %{$config->{paths}}) {
 }
 
 ########## CONSTANTS ##########
-my $soft_n_libs_dir = shift @constants;
-my $download_dir = shift @constants;
-my $bashrc = shift @constants;
-my $bash_aliases = shift @constants;
-my $bash_functions = shift @constants;
-my $gitconfig = shift @constants;
-my $go_root_dir = "$soft_n_libs_dir/go";
+my $soft_n_libs_dir     = parse_tilde($config->{paths}->{software_and_libs});
+my $download_dir        = parse_tilde($config->{paths}->{download_dir});
+my $bashrc              = parse_tilde($config->{paths}->{bashrc});
+my $bash_aliases        = parse_tilde($config->{paths}->{bash_aliases});
+my $bash_functions      = parse_tilde($config->{paths}->{bash_functions});
+my $gitconfig           = parse_tilde($config->{paths}->{gitconfig});
+my $go_root_dir         = "$soft_n_libs_dir/go";
 ###############################
 
 print "Begin migration\n\n";
 
-print "Updating apt ...\n";
+copy_file("$resources/selected_aliases", $bash_aliases);
+copy_file("$resources/selected_functions", $bash_functions);
+copy_file("$resources/selected_gitconfig", $gitconfig);
+
+my $cmd = dirname($0) . "/write-source-block.sh \"" . $bash_aliases . "\" " . $bashrc;
+print "cmd: $cmd\n";
+system(dirname($0) . "/write-source-block.sh \"" . $bash_aliases . "\" " . $bashrc);
+system(dirname($0) . "/write-source-block.sh \"" . $bash_functions . "\" " . $bashrc);
+exit
+
+print "\nUpdating apt ...\n";
 system("sudo apt-get -qqy update >/dev/null 2>&1");
 print "Upgrading apt ...\n\n";
 system("sudo apt-get -qqy upgrade >/dev/null 2>&1");
+
 
 ###### process programs ######
 
@@ -116,20 +129,39 @@ for (keys %{$config->{gomkmkinstalias}}) {
 
 ########## SUBS ##########
 
+sub parse_tilde {
+    my $filename = shift;
+    my $homedir = $ENV{HOME};
+
+    if ($filename =~ /^~/) {
+        $filename =~ s/^~//;
+        $filename = File::Spec->catfile($homedir, $filename);
+    }
+    return $filename;
+}
+
 sub copy_file {
     my $source = shift;
-    my $file_source = basename($source);
     my $target = shift;
+    my $file_source = basename($source);
     my $file_target = basename($target);
     my $dir = dirname($target);
 
-    system("cp $target $target.bak && echo Backed up existed '$file_target' found in '$dir'") if -e $target;
+    # print "source: $source\n";
+    # print "fsource: $file_source\n";
+    # print "target: $target\n";
+    # print "ftarget: $file_target\n";
+    # print "dir: $dir\n";
+
+    if (-f "$target") {
+        system("cp $target $target.bak && echo Backed up existing \\'$file_target\\' found in \\'$dir\\'");
+    }
     system("cp $source $target");
     my $exit_val = $? >> 8;
     if ($exit_val == 0) {
-        print "Copied '$file_source' in '$dir'\n";
+        print "Copied '$file_source' in '$dir' as '$file_target'\n\n";
     } else {
-        print "Failed to copy '$file_source' in '$dir'\n";
+        print "Failed to copy '$file_source' in '$dir' as '$file_target'\n\n";
         push @failed, $file_source;
     }
 }
