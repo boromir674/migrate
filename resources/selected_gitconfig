@@ -3,24 +3,70 @@
 	email = 
 
 [alias]
+
+# LOG aliases
 # Timeline of commits; history of commits
-  tl             = log --graph --all --oneline  --decorate
-  tl1            = log --graph --all --full-history --oneline --decorate
-  t12            = log --graph --all --full-history --color --oneline --decorate
-  tls            = log --color --pretty="format:%d %s --> %an %ae %cn %ce %ar" --graph
-  ls             = log --stat --decorate
+
+# --graph    : renders a graph with nodes and vertices
+# --oneline  : formats each node/commit in a single line rendering commit's message 'header' (1st line)
+# --decorate : display all the references (e.g., branches, tags, etc) that point to each commit
+# --all      : display information about remote refs (ie branches, tags) too
+# --stat     : display additions and deletions per changed file and total changes stats
+
+# --full-history
+
+# Graph of commits
+
+# Render each commit in a single line
+  l              = log --graph --decorate --color --oneline
+  la             = log --graph --decorate --color --oneline --all
+  ls             = log --graph --decorate --color --stat --oneline
+
+# Render each commit's full hash, full message, author, date; covers multiple lines
+  lv             = log --graph --decorate --color
+  lsv            = log --graph --decorate --color --stat
+  lvs            = log --graph --decorate --color --stat
+
+# stats of local and remote 
+  las            = log --graph --decorate --color --oneline --all --stat
+  lsa            = log --graph --decorate --color --oneline --all --stat
+
+  # Verbose version of the above.
+  # Most possible info (remote, local, full commit message, full hash)
+  lasv           = log --graph --decorate --color --all --stat
+  lsav           = log --graph --decorate --color --all --stat
+
+  lav            = log --graph --decorate --color --all
+  lva            = log --graph --decorate --color --all
+  
+
+# like l alias plus it includes dates and author information per node/commit 
+  lp             = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  lps            = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --stat
+  lsp            = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --stat
+
+  lpa            = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all
+  lap            = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all
+
+  lasp           = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --all --stat
+
+
 # Status of working tree; changed files, untracked files; index status
   st             = status
   stu            = status -uno
+
 # Git Commit shotcuts/aliases
   cm             = commit -m
-  ca		 = commit --amend
+  ca		         = commit --amend
+
+# Other git commands
   root           = rev-parse --show-toplevel
   dn             = diff --name-only
   ds             = diff --stat
   ch             = checkout
+  
   # Branches
-  br		 = branch
+  br		         = branch
   # move branch pointer to a different commit without checkout
   move-branch    = "!sh -c \"git branch -f $1 $2\" -"s
   push-n-track   = "!sh -c \"git push -u origin $1\" -"s  # push local branch and track to be able to auto pull/push
