@@ -80,6 +80,22 @@
   # Delete remote tag
   del-remote-tag = "!sh -c \"git push --delete origin $1\" -"s
 
+
+  # STATS
+  # Number of commits for each user (groups per author)
+  stats         = git shortlog -sn --all
+
+  # Number of commits for each user (groups per commiter)
+  stats-c         = git shortlog -snc --all
+  
+  # show email
+  stats-e       = git shortlog -sne --all
+  stats-ce      = git shortlog -snce --all
+
+
+  # TODO: test below
+  # git log --author="authorsname" --format=tformat: --numstat | q -t "select sum(c1), sum(c2) from -"
+
 [branch]
 	autosetuprebase = always
 	autosetupmerge = true
