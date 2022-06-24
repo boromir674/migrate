@@ -55,30 +55,79 @@
   st             = status
   stu            = status -uno
 
-# Git Commit shotcuts/aliases
+# Git Commit shortcuts (aliases)
   cm             = commit -m
   ca		         = commit --amend
 
 # Other git commands
+# show the root directory of this repository
   root           = rev-parse --show-toplevel
   dn             = diff --name-only
   ds             = diff --stat
   ch             = checkout
-  
+
+# Show files in tree
+  # show all tracked files for current branch
+  files-tracked  = "!sh -c \"git ls-tree -r HEAD --name-only\" -"s
+
+  # show all files that ever existed (ie including deleted files)
+  files-existed  = "!sh -c \"git log --pretty=format: --name-only --diff-filter=A | sort - | sed '/^$/d'\" -"s
+
+  # show all tracked files for given reference (eg branch, commit, tag)
+  # 1st arg: object reference
+  ref-files-tracked  = "!sh -c \"git ls-tree -r $1 --name-only\" -"s
+
+
   # Branches
   br		         = branch
-  # move branch pointer to a different commit without checkout
+  # move a branch pointer to a any commit without checkout
+  # 1st arg: branch name
+  # 2nd arg: commit sha
   move-branch    = "!sh -c \"git branch -f $1 $2\" -"s
-  push-n-track   = "!sh -c \"git push -u origin $1\" -"s  # push local branch and track to be able to auto pull/push
-  del-remote     = "!sh -c \"git push origin --delete $1\" -"s  # delete remote branch
+  # move a branch pointer to the current commit (without checkout)
+  # 1st arg: branch name
+  move-branch-here    = "!sh -c \"git branch -f $1 HEAD\" -"s
+
+  # Push a branch to the 'origin' remote (and setup 'tracking' if necessary)
+  # push & track a local branch to be able to auto pull/push onwards:
+  # git will remember the subject branch, when invoking 'git push' or 'git pull'
+  # 1st arg: branch name
+  push-n-track    = "!sh -c \"git push -u origin $1\" -"s
+  # Push current branch to the 'origin' remote (and setup 'tracking' if necessary)
+  push-n-track-me = "!sh -c \"git push -u origin HEAD\" -"s
+
   mirror-n-track = "!sh -c \"git branch --track $1 origin/$1\" -"s # "copy" remote branch to create identical local and track
+
+  # Delete a branch on the 'origin' remote (use with caution!)
+  # 1st arg: branch name (no need to include the 'origin':
+  # eg correct input: temp-branch; incorrect input: origin/temp-branch
+  del-remote     = "!sh -c \"git push origin --delete $1\" -"s
 
   # Tagging
   tag-annotated  = "!sh -c \"git tag -a $1 -m $2\" -"s
+
+  # Push a tag to a remote repository
+  # 1st arg: tag reference
+  push-tag     	  = "!sh -c \"git push origin $1\" -"s
+
+  # Push all tags to a remote repository
+  push-all-tags   = push --tags origin
+
   # Delete local tag
   del-tag = "!sh -c \"git tag -d $1\" -"s
+
   # Delete remote tag
   del-remote-tag = "!sh -c \"git push --delete origin $1\" -"s
+
+
+  # Setting file to past state
+  # 1st arg: commit hash
+  # 2nd arg: file path
+  set-file-to-state  = "!sh -c \"git checkout $1 -- $2\" -"s
+
+  # Remove accidentally commited file, but keep on disk
+  # 1st arg: file path
+  uncommit      = "!sh -c \"git rm --cached $1 && git commit -m 'chore: uncommit file'\" -"s
 
 
   # STATS
@@ -96,13 +145,14 @@
   # TODO: test below
   # git log --author="authorsname" --format=tformat: --numstat | q -t "select sum(c1), sum(c2) from -"
 
+
 [branch]
 	autosetuprebase = always
 	autosetupmerge = true
 [push]
 	default = current
 [core]
-	editor = nano
+	editor = code --wait
 [color]
 	ui = true
 [fetch]
@@ -114,3 +164,7 @@
         pushNonFastForward = false  # if pushing is blocked, just force fast forward (i.e. git push -f)
 [rerere]
 	enabled = true
+[diff]
+    tool = default-difftool
+[difftool "default-difftool"]
+    cmd = code --wait --diff $LOCAL $REMOTE
