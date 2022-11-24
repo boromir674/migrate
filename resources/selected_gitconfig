@@ -132,14 +132,14 @@
 
   # STATS
   # Number of commits for each user (groups per author)
-  stats         = git shortlog -sn --all
+  stats         = shortlog -sn --all
 
   # Number of commits for each user (groups per commiter)
-  stats-c         = git shortlog -snc --all
+  stats-c       = shortlog -snc --all
   
   # show email
-  stats-e       = git shortlog -sne --all
-  stats-ce      = git shortlog -snce --all
+  stats-e       = shortlog -sne --all
+  stats-ce      = shortlog -snce --all
 
 
   # TODO: test below
